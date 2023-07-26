@@ -32,13 +32,13 @@ int main() {
     // ############################### Part A #######################################
     // ##############################################################################
     // Call the word guessing game
-    // bool gameResult = playWordGuessingGame(randomWord);
+     bool gameResult = playWordGuessingGame(randomWord);
 
-    // if (gameResult) {
-    //     printf("Congratulations! You guessed the word correctly: %s\n", randomWord);
-    // } else {
-    //     printf("Out of attempts. The word was: %s\n", randomWord);
-    // }
+     if (gameResult) {
+         printf("Congratulations! You guessed the word correctly: %s\n", randomWord);
+     } else {
+         printf("Out of attempts. The word was: %s\n", randomWord);
+     }
 
     // ##############################################################################
 

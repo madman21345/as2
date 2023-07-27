@@ -125,45 +125,50 @@ bool playWordGuessingGame ( const char * randomWord ) {
 }
 
 //asked chatgpt for help with removing elements from arrays, took parts of it.
-void removeElement(char **array, int index, int size) {
-    if (index < 0 || index >= size) {
+void removeElement(char **array, int index, int* size) {
+    if (index < 0 || index >= *size) {
         // Invalid index, do nothing.
         return;
     }
 
     // Shift the remaining elements to fill the gap.
-    for (int i = index; i < size - 1; i++) {
+    for (int i = index; i < *size; i++) {
         array[i] = array[i + 1];
     }
 
     // Free the memory no longer occupied.
-    free(array[size]);
+    free(array[*size]);
     // Decrement the size of the array.
-    (size)--;
+    (*size)--;
 
     // Resize the array to free up the memory of the last element (which is now a duplicate).
-    *array = realloc(array, (size) * sizeof(char*));
+    //*array = realloc(array, (*size) * sizeof(char*));
 }
 
-char autoguess( int numPossibleWords, char ** possibleWords, char *displayWord, char *guessedLetters ) {
+char autoguess( int *numPossibleWords, char ** possibleWords, char *displayWord, char *guessedLetters ) {
     char guess;
     //according to the concise oxford dictionary these are the most common letters in order
     char *alpha = "eariotnslcudpmhgbfywkvxzjq";
 
     //go through possible words and remove any that it cant be
-    for(int i = 0; i < numPossibleWords; i++ ) {
+    int i = 0;
+    while( i < *numPossibleWords) {
+        bool removal = false;
 
         for (size_t j = 0; j < strlen(displayWord); j++) {
 
-            if(displayWord[j] != "-" && possibleWords[i][j] != displayWord[j]) {
-                //remove words that aren't possible anymore
-                removeElement(possibleWords, i, numPossibleWords);
-                break;
-
-            } else {
+            if(displayWord[j] == '-' || possibleWords[i][j] == displayWord[j]) {
                 continue;
+            } else {
+                //remove words that aren't possible anymore
+                removal = true;
+                break;
             }
-            
+        }
+        if(removal) {
+            removeElement(possibleWords,i,numPossibleWords);
+        } else{
+            i++;
         }
     }
 
@@ -212,9 +217,9 @@ bool playWordGuessingGameAutomatic ( const char * randomWord, char ** words, int
     }
     possibleWords[numPossibleWords] = NULL;
     //free the rest
-    for (int i = numPossibleWords+1; i < numWords; i++) {
-        free(possibleWords[i]);
-    }
+    //for (int i = numPossibleWords+1; i < numWords; i++) {
+    //    free(possibleWords[i]);
+    //}
 
     //display blank word so that there's some insight from how big word is
     printf("\nContinue entering letters until you complete the word.\n");
@@ -224,11 +229,10 @@ bool playWordGuessingGameAutomatic ( const char * randomWord, char ** words, int
     while ( attempts < MAX_ATTEMPTS ) {
         while(true) {
             printf("Please wait. Eliminating words...\n");
-            printf("Attempt %d,%d: ",numPossibleWords, attempts+1);
-            ;
             if(attempts < MAX_ATTEMPTS -1) {
-                if(numPossibleWords > 0) {
-                    guess = autoguess( numPossibleWords, possibleWords, displayedWord, guessedLetters);
+                if(numPossibleWords > 1) {
+                    printf("Attempt %d: ", attempts+1);
+                    guess = autoguess( &numPossibleWords, possibleWords, displayedWord, guessedLetters);
                 } else {
                     ;//in the example when there was only 1 word left it just kept putting the same letter
                 }
@@ -241,7 +245,7 @@ bool playWordGuessingGameAutomatic ( const char * randomWord, char ** words, int
                     if(possibleWords[i] == NULL) {break;}
                     printf("%s\n",possibleWords[i]);
                 }
-                printf("\nAttempt %d:",attempts+1);
+                printf("Attempt %d: ", attempts+1);
                 guess = inputGuess(guessedLetters);
                 //guess = oldInputGuess();
             }

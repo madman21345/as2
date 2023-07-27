@@ -8,6 +8,7 @@
 
 #define MAX_LETTERS 26
 
+
 //displays the current situation of the word
 //also creates and store the word
 void display( const char *randomWord, char guessedLetters[], char displayWord[] ) {
@@ -21,7 +22,7 @@ void display( const char *randomWord, char guessedLetters[], char displayWord[] 
     }
     //null-terminating
     displayWord[strlen(randomWord)] = '\0';
-    printf("%s\n\n", displayWord);
+    printf("\n%s\n\n", displayWord);
 }
 
 //from as1 just reused for char and modified for this use case
@@ -48,9 +49,9 @@ char inputGuess(char guessedLetters[]) {
         int result = scanf(" %c", &guess);
         while (getchar() != '\n');
 
-        if(result != 1) {
+        if(result != 1 || !( (guess >= 'a' && guess <= 'z') ) ) {
             // Clearing the input buffer outside now to get rid of multiple characters
-            printf("Invalid input. Enter again: ");
+            printf("Invalid input(try lowercase). Enter again: ");
             continue;
         }
         //asked chatgpt if there were any functions that could shorten my for loop I was using before
@@ -68,14 +69,19 @@ char inputGuess(char guessedLetters[]) {
 
 //main program for part A
 bool playWordGuessingGame ( const char * randomWord ) {
-    char guessedLetters[MAX_LETTERS];
+
+    char *guessedLetters = malloc(MAX_LETTERS * sizeof(char));
     char guess;
     int totalGuesses = 0;
     int attempts = 0;
-    char displayedWord[strlen(randomWord)]; //use this to store the word with '-' where not guessed yet.
+    char *displayedWord = malloc(strlen(randomWord) * sizeof(char)); //use this to store the word with '-' where not guessed yet.
+
+    if(displayedWord == NULL || guessedLetters == NULL) {
+        printf("MEMORY ALLOCATION FAILED");return 0;
+    }
 
     //< some of your code if necessary >
-    //display blank word so that there's some insight of how big word is
+    //display blank word so that there's some insight from how big word is
     printf("\nContinue entering letters until you complete the word.\n");
     printf("Your word is %ld letters long,\n", strlen(randomWord));
     display(randomWord, guessedLetters, displayedWord);
@@ -95,7 +101,7 @@ bool playWordGuessingGame ( const char * randomWord ) {
 
             //go next attempt if not correct guess
             if(strchr(randomWord, guess)== NULL) {
-                printf("Incorrect Guess. Try again.\n");
+                if(attempts < MAX_ATTEMPTS -1) {printf("Incorrect Guess. Try again.\n");}
                 break;
             }
             // and end if guessed all letters
@@ -112,9 +118,66 @@ bool playWordGuessingGame ( const char * randomWord ) {
     }
     //<if the run reaches here it means after MAX_ATTEMPTS ... >
     //< the letters are not found , so use return false ; >
+    //free(guessedLetters);
+    //free(displayedWord);
+    
     return false;
 }
 
+//asked chatgpt for help with removing elements from arrays, took parts of it.
+void removeElement(char **array, int index, int size) {
+    if (index < 0 || index >= size) {
+        // Invalid index, do nothing.
+        return;
+    }
+
+    // Shift the remaining elements to fill the gap.
+    for (int i = index; i < size - 1; i++) {
+        array[i] = array[i + 1];
+    }
+
+    // Free the memory no longer occupied.
+    free(array[size]);
+    // Decrement the size of the array.
+    (size)--;
+
+    // Resize the array to free up the memory of the last element (which is now a duplicate).
+    *array = realloc(array, (size) * sizeof(char*));
+}
+
+char autoguess( int numPossibleWords, char ** possibleWords, char *displayWord, char *guessedLetters ) {
+    char guess;
+    //according to the concise oxford dictionary these are the most common letters in order
+    char *alpha = "eariotnslcudpmhgbfywkvxzjq";
+
+    //go through possible words and remove any that it cant be
+    for(int i = 0; i < numPossibleWords; i++ ) {
+
+        for (size_t j = 0; j < strlen(displayWord); j++) {
+
+            if(displayWord[j] != "-" && possibleWords[i][j] != displayWord[j]) {
+                //remove words that aren't possible anymore
+                removeElement(possibleWords, i, numPossibleWords);
+                break;
+
+            } else {
+                continue;
+            }
+            
+        }
+    }
+
+    //choose a letter to guess
+    for(int i = 0; i < MAX_LETTERS; i++ ) {
+        if(strchr(guessedLetters, alpha[i]) == NULL) {
+            guess = alpha[i];
+            printf("%c", guess);
+            break;
+        }
+    }
+    
+    return guess;
+}
 
 // numSuggestion : is the maximum number of possible word that can be printed
 // I have set this to 50 to make sure the Terminal is not gonna be messy
@@ -127,26 +190,62 @@ bool playWordGuessingGameAutomatic ( const char * randomWord, char ** words, int
     //< the same algorithm in Part A >
     //< until : attempts == MAX_ATTEMPTS - 1 >
     //< your code goes here >
+    char ** possibleWords = malloc(numWords * sizeof(char *));
+    int numPossibleWords = 0;
 
-    char guessedLetters[MAX_LETTERS];
+    char *guessedLetters = malloc(MAX_LETTERS * sizeof(char));
     char guess;
     int totalGuesses = 0;
     int attempts = 0;
-    char displayedWord[strlen(randomWord)]; //use this to store the word with '-' where not guessed yet.
+    char *displayedWord = malloc(strlen(randomWord) * sizeof(char)); //use this to store the word with '-' where not guessed yet.
 
-    //display blank word so that there's some insight of how big word is
+    if(displayedWord == NULL || guessedLetters == NULL || possibleWords == NULL) {
+        printf("MEMORY ALLOCATION FAILED");return 0;
+    }
+
+    //initializing possibleWords using length of words
+    for(int i = 0; i < numWords; i++) {
+        if(strlen(words[i]) == strlen(randomWord)) {
+            possibleWords[numPossibleWords] = malloc((strlen(words[i]) + 1) * sizeof(char));
+            strcpy(possibleWords[numPossibleWords++], words[i]);
+        }
+    }
+    possibleWords[numPossibleWords] = NULL;
+    //free the rest
+    for (int i = numPossibleWords+1; i < numWords; i++) {
+        free(possibleWords[i]);
+    }
+
+    //display blank word so that there's some insight from how big word is
     printf("\nContinue entering letters until you complete the word.\n");
     printf("Your word is %ld letters long,\n", strlen(randomWord));
     display(randomWord, guessedLetters, displayedWord);
 
-    while ( attempts < MAX_ATTEMPTS - 1 ) {
+    while ( attempts < MAX_ATTEMPTS ) {
         while(true) {
-            printf("Attempt %d: ",attempts+1);
-            guess = autoguess(randomWord, words, numWords);
-            //guess = inputGuess(guessedLetters);
-            //guess = oldInputGuess();
+            printf("Please wait. Eliminating words...\n");
+            printf("Attempt %d,%d: ",numPossibleWords, attempts+1);
+            ;
+            if(attempts < MAX_ATTEMPTS -1) {
+                if(numPossibleWords > 0) {
+                    guess = autoguess( numPossibleWords, possibleWords, displayedWord, guessedLetters);
+                } else {
+                    ;//in the example when there was only 1 word left it just kept putting the same letter
+                }
+            } else {
+                int nums = numSuggestion;
+                if(numPossibleWords < numSuggestion) {nums = numPossibleWords;}
 
-            //added this so that can swap between the different input methods if the other one is wanted
+                printf("\nThere are only %d words left.\nHere is %d(up to %d) possible words: \n", numPossibleWords, nums, numSuggestion);
+                for(int i=0; i<nums; i++) {
+                    if(possibleWords[i] == NULL) {break;}
+                    printf("%s\n",possibleWords[i]);
+                }
+                printf("\nAttempt %d:",attempts+1);
+                guess = inputGuess(guessedLetters);
+                //guess = oldInputGuess();
+            }
+
             if (strchr(guessedLetters, guess) == NULL) {
                 guessedLetters[totalGuesses++] = guess;
             }
@@ -155,7 +254,7 @@ bool playWordGuessingGameAutomatic ( const char * randomWord, char ** words, int
 
             //go next attempt if not correct guess
             if(strchr(randomWord, guess)== NULL) {
-                printf("Incorrect Guess. Try again.\n");
+                if(attempts < MAX_ATTEMPTS -1) {printf("Incorrect Guess. Try again.\n");}
                 break;
             }
             // and end if guessed all letters
@@ -167,9 +266,17 @@ bool playWordGuessingGameAutomatic ( const char * randomWord, char ** words, int
 
         attempts++;
     }
+    free(guessedLetters);
+    for(int i = 0; i < numPossibleWords; i++) {
+        free(possibleWords[i]);
+    }
+    free(possibleWords);
+    free(displayedWord);
+    
     return false;
 }
 
-char autoguess(const char * randomWord, char ** words, int numWords) {
-    
-}
+
+
+//used lecture notes and main.c to understand how malloc works, but also used chatgpt for clarification on
+//how it works and how to use it and free it.

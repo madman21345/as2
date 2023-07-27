@@ -46,18 +46,18 @@ int main() {
     // ##############################################################################
     // ############################### Part B #######################################
     // ##############################################################################
-    // printf("\n\nAutomatic Version.\n");
-    // printf("\nThe server has generated a random word. You have %d attempts to guess the word.\n", MAX_ATTEMPTS);
+     printf("\n\nAutomatic Version.\n");
+     printf("\nThe server has generated a random word. You have %d attempts to guess the word.\n", MAX_ATTEMPTS);
 
-    // // Call the automatic version of the word guessing game
-    // int numSuggestion =50;
-    // bool gameResult_auto = playWordGuessingGameAutomatic(randomWord, words, numWords, numSuggestion);
+     // Call the automatic version of the word guessing game
+     int numSuggestion =50;
+     bool gameResult_auto = playWordGuessingGameAutomatic(randomWord, words, numWords, numSuggestion);
 
-    // if (gameResult_auto) {
-    //     printf("Congratulations! You guessed the word correctly: %s\n", randomWord);
-    // } else {
-    //     printf("Out of attempts. The word was: %s\n", randomWord);
-    // }
+     if (gameResult_auto) {
+         printf("Congratulations! You guessed the word correctly: %s\n", randomWord);
+     } else {
+         printf("Out of attempts. The word was: %s\n", randomWord);
+     }
 
     // ##############################################################################
 

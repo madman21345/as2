@@ -283,7 +283,7 @@ bool playWordGuessingGameAutomatic ( const char * randomWord, char ** words, int
                         if(possibleWords[i] == NULL) {break;}
                         printf("%s\n",possibleWords[i]);
                     }
-                    print = false;
+                    print = false;//CAN COMMENT THIS OUT IF WANT HINT AFTER EVERY GUESS
                 }
                 printf("Attempt %d: ", attempts+1);
                 guess = inputGuess(guessedLetters);

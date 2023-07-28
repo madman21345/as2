@@ -6,6 +6,7 @@ So,
 1.	“make clean”
 2.	“make”
 3.	“./main”
+
 OR	
 1.	“gcc -g -c main.c”
 2.	“gcc -g -c functions.c”

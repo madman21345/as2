@@ -1,3 +1,5 @@
+//M HAMZA KHAN  400323010
+//ASSIGNMENT 2
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -283,7 +285,7 @@ bool playWordGuessingGameAutomatic ( const char * randomWord, char ** words, int
                         if(possibleWords[i] == NULL) {break;}
                         printf("%s\n",possibleWords[i]);
                     }
-                    print = false;//CAN COMMENT THIS OUT IF WANT HINT AFTER EVERY GUESS
+                    //print = false;//CAN COMMENT THIS OUT IF WANT HINT AFTER EVERY GUESS
                 }
                 printf("Attempt %d: ", attempts+1);
                 guess = inputGuess(guessedLetters);

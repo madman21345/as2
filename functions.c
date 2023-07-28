@@ -266,7 +266,8 @@ bool playWordGuessingGameAutomatic ( const char * randomWord, char ** words, int
                     printf("Attempt %d: ", attempts+1);
                     guess = autoguess( &numPossibleWords, possibleWords, displayedWord, guessedLetters);
                 } else {
-                    printf("Attempt %d: %c", attempts+1, guess);
+                    printf("ONLY 1 WORD REMAINS");
+                    attempts = 3;
                     ;//in the example when there was only 1 word left it just kept putting the same letter
                 }
             } else {

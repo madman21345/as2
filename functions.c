@@ -264,12 +264,15 @@ bool playWordGuessingGameAutomatic ( const char * randomWord, char ** words, int
             if(attempts < MAX_ATTEMPTS -1) {
                 if(numPossibleWords > 1) {
                     printf("Attempt %d: ", attempts+1);
-                    //guess = autoguess( guessedLetters );
-                    guess = inputGuess( guessedLetters );
+                    
+                    //CHANGE HERE FOR MANUAL OR AUTOMATIC
+                    //guess = autoguess( guessedLetters ); //AUTO
+                    guess = inputGuess( guessedLetters );  //MANUAL
+
                 } else {
-                    printf("ONLY 1 WORD REMAINS");
+                    printf("ONLY 1 WORD REMAINS\n");
                     attempts = 3;
-                    ;//in the example when there was only 1 word left it just kept putting the same letter
+                    break;//in the example when there was only 1 word left it just kept putting the same letter
                 }
             } else {
                 int nums = numSuggestion;

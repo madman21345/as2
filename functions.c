@@ -124,7 +124,7 @@ bool playWordGuessingGame ( const char * randomWord ) {
     return false;
 }
 
-//asked chatgpt for help with removing elements from arrays, took parts of it.
+//asked chatgpt for help with removing elements from allocated arrays, took parts of it. was extremely confusing
 void removeElement(char **array, int index, int* size) {
     if (index < 0 || index >= *size) {
         // Invalid index, do nothing.
@@ -184,6 +184,36 @@ char autoguess( int *numPossibleWords, char ** possibleWords, char *displayWord,
     return guess;
 }
 
+void removeGuessed(int *numPossibleWords, char ** possibleWords, char *displayWord, char *guessedLetters ) {
+    char uGuessedLetters[MAX_LETTERS];
+    int nums = 0;
+    //get all of the unused letters
+    for(int i = 0; i < MAX_LETTERS; i++) {
+        if(strchr(displayWord,guessedLetters[i]) == NULL) {
+            uGuessedLetters[nums++] = guessedLetters[i];
+        }
+    }
+    //remove words that have the guessedletters that arent correct since they arent in it
+    if(nums > 0) {
+        int i = 0;
+        while(i < *numPossibleWords) {
+            bool removal = false;
+            for(int j = 0; j < nums; j++) {
+
+                if(strchr(possibleWords[i],uGuessedLetters[j])) {
+                    removal = true;//removeElement(possibleWords,i,numPossibleWords);
+                    break;
+                }
+            }
+            if(removal) {
+                removeElement(possibleWords,i,numPossibleWords);
+            } else {
+                i++;
+            }
+        }
+    }
+}
+
 // numSuggestion : is the maximum number of possible word that can be printed
 // I have set this to 50 to make sure the Terminal is not gonna be messy
 // numWords : is the number of words in words array
@@ -226,24 +256,29 @@ bool playWordGuessingGameAutomatic ( const char * randomWord, char ** words, int
     printf("Your word is %ld letters long,\n", strlen(randomWord));
     display(randomWord, guessedLetters, displayedWord);
 
+    bool print = true;//i didnt wanna figure this out. so work around to only print once
     while ( attempts < MAX_ATTEMPTS ) {
         while(true) {
             printf("Please wait. Eliminating words...\n");
+            removeGuessed(&numPossibleWords, possibleWords, displayedWord, guessedLetters); //ideally only need to do this when fail, and only need to pass the failed character, but I dont have more time.
             if(attempts < MAX_ATTEMPTS -1) {
                 if(numPossibleWords > 1) {
                     printf("Attempt %d: ", attempts+1);
                     guess = autoguess( &numPossibleWords, possibleWords, displayedWord, guessedLetters);
                 } else {
+                    printf("Attempt %d: %c", attempts+1, guess);
                     ;//in the example when there was only 1 word left it just kept putting the same letter
                 }
             } else {
                 int nums = numSuggestion;
                 if(numPossibleWords < numSuggestion) {nums = numPossibleWords;}
-
-                printf("\nThere are only %d words left.\nHere is %d(up to %d) possible words: \n", numPossibleWords, nums, numSuggestion);
-                for(int i=0; i<nums; i++) {
-                    if(possibleWords[i] == NULL) {break;}
-                    printf("%s\n",possibleWords[i]);
+                if(print) {
+                    printf("\nThere are only %d words left.\nHere is %d(up to %d) possible words: \n", numPossibleWords, nums, numSuggestion);
+                    for(int i=0; i<nums; i++) {
+                        if(possibleWords[i] == NULL) {break;}
+                        printf("%s\n",possibleWords[i]);
+                    }
+                    print = false;
                 }
                 printf("Attempt %d: ", attempts+1);
                 guess = inputGuess(guessedLetters);

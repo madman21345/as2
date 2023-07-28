@@ -11,7 +11,9 @@ char inputGuess(char guessedLetters[]);
 bool playWordGuessingGame( const char * randomWord );
 
 
+void removeElement(char **array, int index, int* size);
 char autoguess( int *numPossibleWords, char ** possibleWords, char *displayWord, char *guessedLetters );
+void removeGuessed(int *numPossibleWords, char ** possibleWords, char *displayWord, char *guessedLetters );
 
 bool playWordGuessingGameAutomatic ( const char * randomWord, char ** words, int numWords, int numSuggestion );
 

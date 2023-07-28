@@ -145,32 +145,10 @@ void removeElement(char **array, int index, int* size) {
     //*array = realloc(array, (*size) * sizeof(char*));
 }
 
-char autoguess( int *numPossibleWords, char ** possibleWords, char *displayWord, char *guessedLetters ) {
+char autoguess( char *guessedLetters ) {
     char guess;
     //according to the concise oxford dictionary these are the most common letters in order
     char *alpha = "eariotnslcudpmhgbfywkvxzjq";
-
-    //go through possible words and remove any that it cant be
-    int i = 0;
-    while( i < *numPossibleWords) {
-        bool removal = false;
-
-        for (size_t j = 0; j < strlen(displayWord); j++) {
-
-            if(displayWord[j] == '-' || possibleWords[i][j] == displayWord[j]) {
-                continue;
-            } else {
-                //remove words that aren't possible anymore
-                removal = true;
-                break;
-            }
-        }
-        if(removal) {
-            removeElement(possibleWords,i,numPossibleWords);
-        } else{
-            i++;
-        }
-    }
 
     //choose a letter to guess
     for(int i = 0; i < MAX_LETTERS; i++ ) {
@@ -210,6 +188,28 @@ void removeGuessed(int *numPossibleWords, char ** possibleWords, char *displayWo
             } else {
                 i++;
             }
+        }
+    }
+
+    //go through possible words and remove any that it cant be
+    int i = 0;
+    while( i < *numPossibleWords) {
+        bool removal = false;
+
+        for (size_t j = 0; j < strlen(displayWord); j++) {
+
+            if(displayWord[j] == '-' || possibleWords[i][j] == displayWord[j]) {
+                continue;
+            } else {
+                //remove words that aren't possible anymore
+                removal = true;
+                break;
+            }
+        }
+        if(removal) {
+            removeElement(possibleWords,i,numPossibleWords);
+        } else{
+            i++;
         }
     }
 }
@@ -264,7 +264,8 @@ bool playWordGuessingGameAutomatic ( const char * randomWord, char ** words, int
             if(attempts < MAX_ATTEMPTS -1) {
                 if(numPossibleWords > 1) {
                     printf("Attempt %d: ", attempts+1);
-                    guess = autoguess( &numPossibleWords, possibleWords, displayedWord, guessedLetters);
+                    //guess = autoguess( guessedLetters );
+                    guess = inputGuess( guessedLetters );
                 } else {
                     printf("ONLY 1 WORD REMAINS");
                     attempts = 3;
